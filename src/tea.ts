@@ -65,10 +65,10 @@ export const delayCmd = <msg>(ms: number, msg: msg): Cmd<msg> =>
 export const msgCmd = <msg>(msg: msg): Cmd<msg> =>
   Task.perform(Task.succeed(msg), identity)
 
-export const noMsg = (): { _tag: 'None' } => ({ _tag: 'None' })
+export const noMsg = (): { _tag: 'NoOp' } => ({ _tag: 'NoOp' })
 
-export const cmdSucceed = (effectSupplier: () => void): Cmd<{ _tag: 'None' }> =>
-  Task.perform<void, { _tag: 'None' }>(Task.succeedLazy(effectSupplier), noMsg)
+export const cmdSucceed = (effectSupplier: () => void): Cmd<{ _tag: 'NoOp' }> =>
+  Task.perform<void, { _tag: 'NoOp' }>(Task.succeedLazy(effectSupplier), noMsg)
 
 // The same as `cmdSucceed` but accepts a function that return a Msg
 // (Similar to `cmdFromPromise` in a way, but instead of accept an aysnc function
@@ -179,5 +179,5 @@ export const performIO = <R, M>(io: IO<R>, toMsg: (r: R) => M) =>
   Task.perform(taskFromIO(io), toMsg)
 
 // Execute IO and discard results by returning `None` msg
-export const performIO_ = <R>(io: IO<R>): Cmd<{ _tag: 'None' }> =>
+export const performIO_ = <R>(io: IO<R>): Cmd<{ _tag: 'NoOp' }> =>
   Task.perform(taskFromIO(io), noMsg)
