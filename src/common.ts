@@ -24,7 +24,6 @@ import * as A from 'fp-ts/lib/Array'
 import * as E from 'fp-ts/lib/Either'
 import * as EqClass from 'fp-ts/lib/Eq'
 import type * as IO from 'fp-ts/lib/IO'
-import * as M from 'fp-ts/lib/Map'
 import * as OrdClass from 'fp-ts/lib/Ord'
 import * as Set from 'fp-ts/lib/Set'
 import { pipe } from 'fp-ts/lib/function'
@@ -117,12 +116,6 @@ export const hasChildOverflow = (ref: { current: HTMLDivElement | null }) => {
 // Capitalize first letter
 export const capFirst = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
-// Display in MB if over 1,000 KB
-export const formatSize = (sizeInKb: number): string => {
-  if (sizeInKb >= 1000) return `${Math.floor(sizeInKb / 1000)}MB`
-  return `${sizeInKb}KB`
 }
 
 export const runIO = <A>(io: IO.IO<A>): A => {
@@ -237,43 +230,6 @@ export const error = (err: string): any => {
     throw new Error(err)
   }
 }
-
-// Given an object convert it to string, so it can be used as `useEffect` dependency
-// Note that
-// - `useEffect` only does shallow obj comparison that's why we need this.
-// - Shouldn't be used it with deep nested object.
-// - Shouldn't be used with 'props.<field>' where the <field> is used to initialize `State`.
-// - Shouldn't be used with `Map` (convert to array using M.toArray first)
-// - When used with `msgFromParent`, be sure to reset it to 'None' after handling it, otherwise
-// the same msgFromParent won't re-trigger the effect.
-// - Consider upgrading to this https://github.com/shuding/stable-hash,
-// if the current implementation is not good enough
-export const mkObjComparable = (obj: object | null): string => {
-  return JSON.stringify(obj)
-}
-
-export const mkMapComparable = (map: Map<string, any>): string => {
-  return mkObjComparable(M.toArray(S.Ord)(map))
-}
-
-// TODO: Meant to be used with 'Forms', but it can cause delay. More investigation needed.
-// Same as `mkObjComparable` but with 'Map' instead, since Map doesn't work with
-// normal JSON.stringify.
-// source: https://stackoverflow.com/a/56150320
-// export const mkMapComparable = <V,>(map: Map<string, V>): string => {
-//   const replacer = (_key: string, value: V) => {
-//     if (value instanceof Map) {
-//       return {
-//         dataType: 'Map',
-//         value: Array.from(value.entries()), // or with spread: value: [...value]
-//       }
-//     } else {
-//       return value
-//     }
-//   }
-
-//   return JSON.stringify(map, replacer)
-// }
 
 // io-ts Json instances for RemoteData
 export const RemoteProgressJson = t.type({
